@@ -12,8 +12,8 @@ namespace CheckoutSystemEngine.Tests
         private static IProductRepository CreateProductRepository()
         {
             ProductRepository rep = new();
-            rep.AddProduct(Product.Create(AppleId, "Apple", 0.60m).Result!);
-            rep.AddProduct(Product.Create(OrangeId, "Orange", 0.25m).Result!);
+            rep.AddProduct(Product.Create(AppleId, "Apple", 0.60m, new DefaultStrategy()).Result!);
+            rep.AddProduct(Product.Create(OrangeId, "Orange", 0.25m, new DefaultStrategy()).Result!);
             return rep;
         }
 
@@ -93,6 +93,73 @@ namespace CheckoutSystemEngine.Tests
         public void EvaluateShoppingCart_Works_WhenQuantitiesNotInteger()
         {
             IProductRepository rep = CreateProductRepository();
+            ShoppingCart cart = new(rep);
+            _ = cart.AddElement(AppleId, 0.5m);
+            _ = cart.AddElement(OrangeId, 0.5m);
+
+            var result = cart.EvaluateShoppingCart();
+
+            Assert.Equal(0.425m, result);
+        }
+
+
+
+
+
+        private static IProductRepository CreateProductRepositoryWithDifferentStrategies()
+        {
+            ProductRepository rep = new();
+            rep.AddProduct(Product.Create(AppleId, "Apple", 0.60m, new BuyOneGetOneStrategy()).Result!);
+            rep.AddProduct(Product.Create(OrangeId, "Orange", 0.25m, new ThreeForTwoStrategy()).Result!);
+            return rep;
+        }
+
+
+        [Fact]
+        public void EvaluateShoppingCart_Works_WithDefaultQuantity_AndDifferentStrategies()
+        {
+            IProductRepository rep = CreateProductRepositoryWithDifferentStrategies();
+            ShoppingCart cart = new(rep);
+            _ = cart.AddElement(AppleId);
+            _ = cart.AddElement(OrangeId);
+            _ = cart.AddElement(AppleId);
+            _ = cart.AddElement(OrangeId);
+            _ = cart.AddElement(OrangeId);
+            _ = cart.AddElement(AppleId);
+
+            var result = cart.EvaluateShoppingCart();
+
+            Assert.Equal(1.7m, result);
+        }
+
+        [Fact]
+        public void EvaluateShoppingCart_Works_WithQuantities_AndDifferentStrategies()
+        {
+            IProductRepository rep = CreateProductRepositoryWithDifferentStrategies();
+            ShoppingCart cart = new(rep);
+            _ = cart.AddElement(AppleId, 4);
+            _ = cart.AddElement(OrangeId, 5);
+
+            var result = cart.EvaluateShoppingCart();
+
+            Assert.Equal(2.20m, result);
+        }
+
+        [Fact]
+        public void EvaluateShoppingCart_Works_WhenEmpty_AndDifferentStrategies()
+        {
+            IProductRepository rep = CreateProductRepositoryWithDifferentStrategies();
+            ShoppingCart cart = new(rep);
+
+            var result = cart.EvaluateShoppingCart();
+
+            Assert.Equal(0m, result);
+        }
+
+        [Fact]
+        public void EvaluateShoppingCart_Works_WhenQuantitiesNotInteger_AndDifferentStrategies()
+        {
+            IProductRepository rep = CreateProductRepositoryWithDifferentStrategies();
             ShoppingCart cart = new(rep);
             _ = cart.AddElement(AppleId, 0.5m);
             _ = cart.AddElement(OrangeId, 0.5m);

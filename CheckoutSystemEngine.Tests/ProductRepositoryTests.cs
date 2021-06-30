@@ -13,7 +13,7 @@ namespace CheckoutSystemEngine.Tests
         [Fact]
         public void AddProduct_Works()
         {
-            Product p = Product.Create(Guid.NewGuid(), "Orange", 123m).Result!;
+            Product p = Product.Create(Guid.NewGuid(), "Orange", 123m, new DefaultStrategy()).Result!;
             ProductRepository rep = new();
 
             ExecutionResult<Unit> result = rep.AddProduct(p);
@@ -27,10 +27,10 @@ namespace CheckoutSystemEngine.Tests
         public void AddProduct_Fails_IfExistingProductId()
         {
             Guid id = Guid.NewGuid();
-            Product p = Product.Create(id, "Orange", 123m).Result!;
+            Product p = Product.Create(id, "Orange", 123m, new DefaultStrategy()).Result!;
             ProductRepository rep = new();
             _ = rep.AddProduct(p);
-            Product p2 = Product.Create(id, "Apple", 234m).Result!;
+            Product p2 = Product.Create(id, "Apple", 234m, new DefaultStrategy()).Result!;
             
             ExecutionResult<Unit> result = rep.AddProduct(p2);
 
@@ -41,10 +41,10 @@ namespace CheckoutSystemEngine.Tests
         [Fact]
         public void AddProduct_Fails_IfExistingProductName()
         {
-            Product p = Product.Create(Guid.NewGuid(), "Orange", 123m).Result!;
+            Product p = Product.Create(Guid.NewGuid(), "Orange", 123m, new DefaultStrategy()).Result!;
             ProductRepository rep = new();
             _ = rep.AddProduct(p);
-            Product p2 = Product.Create(Guid.NewGuid(), "Orange", 234m).Result!;
+            Product p2 = Product.Create(Guid.NewGuid(), "Orange", 234m, new DefaultStrategy()).Result!;
 
             ExecutionResult<Unit> result = rep.AddProduct(p2);
 
@@ -56,7 +56,7 @@ namespace CheckoutSystemEngine.Tests
         public void Find_Works()
         {
             Guid id = Guid.NewGuid();
-            Product p = Product.Create(id, "Orange", 123m).Result!;
+            Product p = Product.Create(id, "Orange", 123m, new DefaultStrategy()).Result!;
             ProductRepository rep = new();
             _ = rep.AddProduct(p);
 

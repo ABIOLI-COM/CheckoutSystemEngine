@@ -10,7 +10,7 @@ namespace CheckoutSystemEngine.Tests
         public void CreateProduct_Works()
         {
             Guid id = Guid.NewGuid();
-            ExecutionResult<Product> result = Product.Create(id, "Orange", 1.23m);
+            ExecutionResult<Product> result = Product.Create(id, "Orange", 1.23m, new DefaultStrategy());
 
             Assert.True(result.IsSuccess);
             Assert.Equal(id, result.Result!.Id);
@@ -22,7 +22,7 @@ namespace CheckoutSystemEngine.Tests
         public void CreateProduct_Works_WithZeroPrice()
         {
             Guid id = Guid.NewGuid();
-            ExecutionResult<Product> result = Product.Create(id, "Orange", 0m);
+            ExecutionResult<Product> result = Product.Create(id, "Orange", 0m, new DefaultStrategy());
 
             Assert.True(result.IsSuccess);
             Assert.Equal(id, result.Result!.Id);
@@ -33,7 +33,7 @@ namespace CheckoutSystemEngine.Tests
         [Fact]
         public void CreateProduct_Fails_IfEmptyGuid()
         {
-            ExecutionResult<Product> result = Product.Create(Guid.Empty, "Orange", 1.23m);
+            ExecutionResult<Product> result = Product.Create(Guid.Empty, "Orange", 1.23m, new DefaultStrategy());
 
             Assert.False(result.IsSuccess);
             Assert.Equal(StringConstants.Product_MissingId, result.ErrorMessage);
@@ -42,7 +42,7 @@ namespace CheckoutSystemEngine.Tests
         [Fact]
         public void CreateProduct_Fails_IfEmptyName()
         {
-            ExecutionResult<Product> result = Product.Create(Guid.NewGuid(), "", 1.23m);
+            ExecutionResult<Product> result = Product.Create(Guid.NewGuid(), "", 1.23m, new DefaultStrategy());
 
             Assert.False(result.IsSuccess);
             Assert.Equal(StringConstants.Product_MissingName, result.ErrorMessage);
@@ -51,7 +51,7 @@ namespace CheckoutSystemEngine.Tests
         [Fact]
         public void CreateProduct_Fails_IfNegativeUnitPrice()
         {
-            ExecutionResult<Product> result = Product.Create(Guid.NewGuid(), "Orange", -123m);
+            ExecutionResult<Product> result = Product.Create(Guid.NewGuid(), "Orange", -123m, new DefaultStrategy());
 
             Assert.False(result.IsSuccess);
             Assert.Equal(StringConstants.Product_NegativeUnitPrice, result.ErrorMessage);

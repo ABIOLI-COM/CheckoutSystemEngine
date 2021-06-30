@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CheckoutSystemEngine
 {
-    public class ShoppingCart
+    public class ShoppingCart : IShoppingCart
     {
         private readonly IProductRepository _products;
 
@@ -21,14 +21,14 @@ namespace CheckoutSystemEngine
             ExecutionResult<Product> findResult = _products.Find(productId);
             if (!findResult.IsSuccess)
                 return ExecutionResult<Unit>.CreateFailure(findResult.ErrorMessage);
-            
+
             return _elements.AddEntry(productId, quantity);
         }
 
         public decimal EvaluateShoppingCart()
             => _elements
-                .Select(kvp => new { ProductId = kvp.Key, ProductUnitPrice = _products.Find(kvp.Key).Result!.UnitPrice, Quantity = kvp.Value })
-                .Select(v => new { v.ProductId, TotalPricePerProduct = v.ProductUnitPrice * v.Quantity })
+                .Select(kvp => new { ProductId = kvp.Key, Product = _products.Find(kvp.Key).Result!, Quantity = kvp.Value })
+                .Select(v => new { v.ProductId, TotalPricePerProduct = v.Product.Strategy.CalculatePrice(v.Product.UnitPrice, v.Quantity) })
                 .Sum(v => v.TotalPricePerProduct);
         // Given the construction of all the other elements, it may be worth to underline that nothing can fail, inside this method, at this point.
     }
